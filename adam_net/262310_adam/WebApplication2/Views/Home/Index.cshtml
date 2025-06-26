@@ -1,0 +1,10 @@
+@{
+    ViewData["Title"] = "find";
+}
+
+<h2>Movies YT</h2>
+
+<form asp-controller="Home" asp-action="Search" method="post">
+    <input type="text" name="query" required />
+    <button type="submit" class="btn btn-primary mt-2">Find</button>
+</form>

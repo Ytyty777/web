@@ -1,0 +1,81 @@
+@model List<WebApplication2.Models.Video>
+@{
+    ViewData["Title"] = "result";
+}
+
+<!-- Sekcja pola wyszukiwania -->
+<div class="search-box text-center my-4">
+    <form asp-controller="Home" asp-action="Search" method="get" class="d-inline-block">
+        <input 
+            type="text" 
+            name="query" 
+            placeholder="..."
+            class="form-control d-inline-block"
+            style="width:600px;" />
+        <button type="submit" class="btn btn-primary">Szukaj</button>
+    </form>
+</div>
+
+<h2 class="text-center text-muted">movie</h2>
+
+<div class="container my-4">
+    <div class="row justify-content-center">
+        @foreach (var video in Model)
+        {
+            var favo = ViewData["Favorites"] as List<string> ?? new List<string>();
+
+            <div class="col-12 col-sm-6 col-md-4 col-lg-3 d-flex">
+                <div class="card flex-fill shadow-sm rounded-3 overflow-hidden">
+                    <iframe class="card-img-top"
+                            src="https://www.youtube.com/embed/@video.vID"
+                            frameborder="0"
+                            allowfullscreen>
+                    </iframe>
+                    <div class="card-body text-center">
+                        <h6 class="card-title">@video.Title</h6>
+                        @if (!favo.Contains(video.vID))
+                        {
+                            <form id="add-to-favorites-form-@video.vID"
+                                  asp-controller="Home"
+                                  asp-action="AddToFavorites"
+                                  method="post"
+                                  class="add-to-favorites-form">
+                                <input type="hidden" name="vID" value="@video.vID" />
+                                <input type="hidden" name="title" value="@video.Title" />
+                                <input type="hidden" name="cID" value="@video.cID" />
+                                <input type="hidden" name="data_m" value="@video.data_m" />
+                                <button type="submit" class="btn btn-warning mt-2 w-100">add to fav</button>
+                            </form>
+                        }
+                        else
+                        {
+                            <button class="btn btn-success mt-2 w-100" disabled>add</button>
+                        }
+                    </div>
+                </div>
+            </div>
+        }
+    </div>
+</div>
+
+@section Scripts {
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script>
+        $(".add-to-favorites-form").submit(function (e) {
+            e.preventDefault();
+            var form = $(this);
+            $.ajax({
+                type: "POST",
+                url: form.attr("action"),
+                data: form.serialize(),
+                success: function (response) {
+                    var button = form.find("button");
+                    button.replaceWith('<button class="btn btn-success mt-2 w-100" disabled>add</button>');
+                },
+                error: function () {
+                    alert("Error adding to favorites.");
+                }
+            });
+        });
+    </script>
+}
